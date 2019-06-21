@@ -52,7 +52,7 @@ app.get('/notes/:id' , (req,res)=>{
     if(_newId) {
         Notes.findById(_id).then((note)=>{
             if(!note) {
-                res.status(404).send('Unable to find the user');
+                res.status(404).send('Unable to find the note');
             }
             res.status(200).send(note);
         }).catch((e)=>{
@@ -63,6 +63,31 @@ app.get('/notes/:id' , (req,res)=>{
          }
 })
 
+
+//delete notes by id
+
+app.delete('/notes/:id' , (req , res)=>{
+
+    const _id =  req.params.id;
+
+    const _newId = mongoose.Types.ObjectId.isValid(_id);
+    console.log(_newId);
+
+    if(_newId) {
+        Notes.findByIdAndDelete(_id).then((note)=>{
+            if(!note) {
+                res.status(404).send('Unable to find the note to delete');
+            }
+            res.status(200).send(note);
+        }).catch((e)=>{
+            console.log(e);
+        })
+    }else{
+        res.status(400).send('Bad ObjectID');
+         }
+
+
+});
 
 
 
