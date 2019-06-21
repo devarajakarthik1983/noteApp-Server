@@ -21,7 +21,7 @@ const Notes = mongoose.model('notes' , {
     },
     completedTime:{
         type:Date,
-        default: Date.now
+        default: null,
     }
 })
 
