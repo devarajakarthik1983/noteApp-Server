@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const {ObjectID} = require('mongodb');
 
@@ -7,11 +8,40 @@ const {ObjectID} = require('mongodb');
 require('./db/mongoose');
 
 const Notes = require('./models/notes')
+const Users = require('./models/users')
 
 const app = express();
+
 const port = process.env.POST || 3001;
 
 app.use(express.json());
+app.use(cors({
+    origin: '*',
+    credentials: true
+}));
+
+//create new user
+
+app.post('/users' , (req,res)=>{
+    const users = {
+        firstname:req.body.firstname,
+        lastname:req.body.lastname,
+        email:req.body.email,
+        password:req.body.password 
+    }
+
+    const newUsers = new Users(users);
+
+    newUsers.save().then((user)=>{
+        res.status(201).send(user);
+    }).catch((e)=>{
+        res.status(400).send(e);
+    })
+    
+})
+
+
+
 
 //post notes
 
@@ -31,16 +61,53 @@ app.post('/notes' , (req , res)=>{
     
 })
 
-//get all notes
+//get all newest Notes
 
-app.get('/notes' , (req , res)=>{
+app.get('/notes' ,(req , res)=>{
 
-    Notes.find({}).then((notes)=>{
+    Notes.find({}).sort({'createTime':'desc'}).then((notes)=>{
         res.status(201).send(notes)
     }).catch((e) =>{
         res.status(500).send(e);
     });
 });
+
+//get all oldest Notes
+
+app.get('/notesoldest' ,(req , res)=>{
+
+    Notes.find({}).sort({'createTime':'asc'}).then((notes)=>{
+        res.status(201).send(notes)
+    }).catch((e) =>{
+        res.status(500).send(e);
+    });
+});
+
+//get all the completed post
+
+app.get('/notescompleted' ,(req , res)=>{
+
+    Notes.find({'complete':'true'}).then((notes)=>{
+        res.status(201).send(notes)
+    }).catch((e) =>{
+        res.status(500).send(e);
+    });
+});
+
+
+//get all the Incompleted post
+
+app.get('/notesnotcomplete' ,(req , res)=>{
+
+    Notes.find({'complete':'false'}).then((notes)=>{
+        res.status(201).send(notes)
+    }).catch((e) =>{
+        res.status(500).send(e);
+    });
+});
+
+
+
 
 //get notes by id
 
