@@ -3,12 +3,14 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const {ObjectID} = require('mongodb');
+const {sendFeedbackEmail} = require('./emails/account');
 
 
 require('./db/mongoose');
 
 const Notes = require('./models/notes')
-const Users = require('./models/users')
+const Feedbacks = require('./models/feedback')
+
 
 const app = express();
 
@@ -20,26 +22,28 @@ app.use(cors({
     credentials: true
 }));
 
-//create new user
 
-app.post('/users' , (req,res)=>{
-    const users = {
+
+//post feedback
+
+app.post('/feedback' , (req , res)=>{
+    const feedback = {
         firstname:req.body.firstname,
         lastname:req.body.lastname,
         email:req.body.email,
-        password:req.body.password 
+        feedback:req.body.feedback
     }
+    
+    const newFeedback = new Feedbacks(feedback);
 
-    const newUsers = new Users(users);
-
-    newUsers.save().then((user)=>{
-        res.status(201).send(user);
+    newFeedback.save().then((note)=>{
+        sendFeedbackEmail(req.body.email , req.body.firstname , req.body.lastname)
+        res.status(201).send(note);
     }).catch((e)=>{
         res.status(400).send(e);
     })
     
 })
-
 
 
 
