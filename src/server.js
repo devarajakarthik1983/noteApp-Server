@@ -1,15 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const passwordValidator = require('password-validator');
+const validator = require('validator');
+const crypto = require('crypto');
 
 const {ObjectID} = require('mongodb');
-const {sendFeedbackEmail} = require('./emails/account');
+const {sendActivationEmail} = require('./emails/account');
 
 
 require('./db/mongoose');
 
 const Notes = require('./models/notes')
 const Feedbacks = require('./models/feedback')
+const Users = require('./models/users')
 
 
 const app = express();
@@ -22,6 +26,70 @@ app.use(cors({
     credentials: true
 }));
 
+
+
+//register user
+
+app.post('/register' , (req , res) =>{
+    var token = crypto.randomBytes(20).toString('hex');
+    const user = {
+        username:req.body.username,
+        email:req.body.email,
+        password:req.body.password,
+        token:token
+    }
+
+    
+    var schema = new passwordValidator();
+    schema
+.is().min(8)                                    // Minimum length 8
+.is().max(20)                                  // Maximum length 20
+.has().uppercase()                              // Must have uppercase letters
+.has().lowercase()                              // Must have lowercase letters
+.has().digits()                                 // Must have digits
+.has().not().spaces()                           // Should not have spaces
+.has().symbols()
+.is().not().oneOf(['Passw0rd', 'Password123', 'password']);
+
+if(schema.validate(req.body.password) && validator.isEmail(req.body.email)){
+    const newUser = new Users(user);
+    newUser.save().then((user)=>{
+       sendActivationEmail(req.body.email , token, req.body.username)
+        res.status(201).send(user);
+    }).catch((e)=>{
+        res.status(400).send(e);
+    })
+} else{
+    //res.staus(404).send('email or password not meeting standards');
+    throw new Error('Email or Password not meeting standards');
+}
+   
+});
+
+//activate a user
+
+app.post('/newuser/:id/:id1' , (req ,res)=>{
+
+    const username =  req.params.id;
+    const token= req.params.id1
+
+    Users.findOne({username}).then(user=>{
+    
+
+    if(token === user.token){
+        return Users.findOneAndUpdate(user.username , {$set:{active:true , token:null}})
+              .then(user=>{
+                  res.status(200).send(user);
+              }) 
+            } else {
+                res.status(404).send('token not matching');
+            }
+     }).catch(e=>{
+        res.status(404).send(e);
+     })
+     })
+
+  
 
 
 //post feedback
@@ -37,7 +105,7 @@ app.post('/feedback' , (req , res)=>{
     const newFeedback = new Feedbacks(feedback);
 
     newFeedback.save().then((note)=>{
-        sendFeedbackEmail(req.body.email , req.body.firstname , req.body.lastname)
+    sendFeedbackEmail(req.body.email , req.body.firstname , req.body.lastname)
         res.status(201).send(note);
     }).catch((e)=>{
         res.status(400).send(e);
