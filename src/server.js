@@ -6,7 +6,7 @@ const validator = require('validator');
 const crypto = require('crypto');
 
 const {ObjectID} = require('mongodb');
-const {sendActivationEmail} = require('./emails/account');
+const {sendActivationEmail , sendFeedbackEmail } = require('./emails/account');
 
 
 require('./db/mongoose');
@@ -54,7 +54,7 @@ app.post('/register' , (req , res) =>{
 if(schema.validate(req.body.password) && validator.isEmail(req.body.email)){
     const newUser = new Users(user);
     newUser.save().then((user)=>{
-       sendActivationEmail(req.body.email , token, req.body.username)
+       //sendActivationEmail(req.body.email , token, req.body.username)
         res.status(201).send(user);
     }).catch((e)=>{
         res.status(400).send(e);
@@ -89,6 +89,24 @@ app.post('/newuser/:id/:id1' , (req ,res)=>{
      })
      })
 
+
+     //forgot username endpoint
+
+     app.get('/forgotusername/:id' , (req , res)=>{
+
+        const email =  req.params.id;
+        
+        Users.findOne({email}).then((user)=>{
+            if(!user) {
+                res.status(404).send('Unable to find the note');
+            }
+            res.status(200).send(user.username);
+        }).catch((e)=>{
+            console.log(e);
+        })
+   
+     })
+
   
 
 
@@ -105,7 +123,7 @@ app.post('/feedback' , (req , res)=>{
     const newFeedback = new Feedbacks(feedback);
 
     newFeedback.save().then((note)=>{
-    sendFeedbackEmail(req.body.email , req.body.firstname , req.body.lastname)
+    //sendFeedbackEmail(req.body.email , req.body.firstname , req.body.lastname)
         res.status(201).send(note);
     }).catch((e)=>{
         res.status(400).send(e);
