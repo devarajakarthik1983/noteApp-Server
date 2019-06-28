@@ -139,7 +139,7 @@ app.post('/feedback' , (req , res)=>{
     const newFeedback = new Feedbacks(feedback);
 
     newFeedback.save().then((note)=>{
-    sendFeedbackEmail(req.body.email , req.body.firstname , req.body.lastname)
+        sendFeedbackEmail(req.body.email , req.body.firstname , req.body.lastname)
         res.status(201).send(note);
     }).catch((e)=>{
         res.status(400).send(e);

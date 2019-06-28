@@ -30,7 +30,7 @@ const Users = mongoose.model('users' , {
     }
 })
 
-//users.index({ email: 1, username: 1 }, { unique: true });
+
 
 
 module.exports = Users;
