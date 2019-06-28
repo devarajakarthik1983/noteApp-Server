@@ -13,12 +13,12 @@ const sendFeedbackEmail =(email , firstname , lastname) => {
 }
 
 
-const sendActivationEmail =(email , token , username) => {
+const sendActivationEmail =(email ,username ,token , encodedUrlEmail) => {
     sgMail.send({
         to: email,
         from: 'no-reply@noteapp.com',
         subject: 'Thankyou for your registering',
-        text:`Hello ${username} , Thankyou for registering click the link to activate: http://localhost:3000/newuser/${username}/${token}`
+        text:`Hello ${username} , Thankyou for registering click the link to activate: http://localhost:3000/newuser/${encodedUrlEmail}/${token}`
     })
 }
 

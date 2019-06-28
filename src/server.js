@@ -32,6 +32,7 @@ app.use(cors({
 
 app.post('/register' , (req , res) =>{
     var token = crypto.randomBytes(20).toString('hex');
+    var encodedEmail = encodeURIComponent(req.body.email);
     const user = {
         username:req.body.username,
         email:req.body.email,
@@ -53,33 +54,48 @@ app.post('/register' , (req , res) =>{
 
 if(schema.validate(req.body.password) && validator.isEmail(req.body.email)){
     const newUser = new Users(user);
-    newUser.save().then((user)=>{
-       //sendActivationEmail(req.body.email , token, req.body.username)
-        res.status(201).send(user);
-    }).catch((e)=>{
-        res.status(400).send(e);
-    })
+   Users.findOne({email:req.body.email})
+   .then((user)=>{
+       if(!user){
+        
+        newUser.save().then(user=>{
+            sendActivationEmail(req.body.email,user.username,token,encodedEmail)
+            res.send(user)
+        })
+       }else {
+           res.send('user exist');
+       }
+   }).catch(e=>{
+       res.send(e);
+   })
 } else{
     //res.staus(404).send('email or password not meeting standards');
     throw new Error('Email or Password not meeting standards');
 }
+
+
+
+
+
    
 });
+
+
 
 //activate a user
 
 app.post('/newuser/:id/:id1' , (req ,res)=>{
 
-    const username =  req.params.id;
+    const email =  req.params.id;
     const token= req.params.id1
+    const decodedEmail = decodeURIComponent(email);
+    //console.log(decodedEmail);
 
-    Users.findOne({username}).then(user=>{
-    
-
+    Users.findOne({email:decodedEmail}).then(user=>{
     if(token === user.token){
         return Users.findOneAndUpdate(user.username , {$set:{active:true , token:null}})
               .then(user=>{
-                  res.status(200).send(user);
+                  res.status(200).send(user.username);
               }) 
             } else {
                 res.status(404).send('token not matching');
@@ -96,11 +112,11 @@ app.post('/newuser/:id/:id1' , (req ,res)=>{
 
         const email =  req.params.id;
         
-        Users.findOne({email}).then((user)=>{
-            if(!user) {
-                res.status(404).send('Unable to find the note');
+        Users.find({email}).then((user)=>{
+            if(user.length === 0) {
+                res.status(404).send('Unable to find the username');
             }
-            res.status(200).send(user.username);
+            res.status(200).send(user);
         }).catch((e)=>{
             console.log(e);
         })
@@ -123,7 +139,7 @@ app.post('/feedback' , (req , res)=>{
     const newFeedback = new Feedbacks(feedback);
 
     newFeedback.save().then((note)=>{
-    //sendFeedbackEmail(req.body.email , req.body.firstname , req.body.lastname)
+    sendFeedbackEmail(req.body.email , req.body.firstname , req.body.lastname)
         res.status(201).send(note);
     }).catch((e)=>{
         res.status(400).send(e);
