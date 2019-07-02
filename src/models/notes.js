@@ -22,6 +22,11 @@ const Notes = mongoose.model('notes' , {
     completedTime:{
         type:Date,
         default: null,
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Users'
     }
 })
 

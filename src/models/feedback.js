@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-const Notes = mongoose.model('feedback' , {
+const Feedbacks = mongoose.model('feedback' , {
     firstname: {
         type:String,
         required:true,
@@ -32,4 +32,4 @@ const Notes = mongoose.model('feedback' , {
 })
 
 
-module.exports = Notes;
+module.exports = Feedbacks;

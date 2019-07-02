@@ -23,8 +23,19 @@ const sendActivationEmail =(email ,username ,token , encodedUrlEmail) => {
 }
 
 
+const sendActivationPassword =(email ,username ,token , encodedUrlEmail) => {
+    sgMail.send({
+        to: email,
+        from: 'no-reply@noteapp.com',
+        subject: 'Your Password activation link',
+        text:`Hello ${username} , Hello here is you password link to activate: http://localhost:3000/passwordactivation/${encodedUrlEmail}/${token}`
+    })
+}
+
 
 module.exports ={
     sendFeedbackEmail,
-    sendActivationEmail
+    sendActivationEmail,
+    sendActivationPassword,
+    
 }
