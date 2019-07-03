@@ -25,39 +25,102 @@ router.post('/notes' , auth , (req , res)=>{
 
 //get all newest Notes
 
-router.get('/notes' , auth ,async (req , res)=>{
+router.get('/notes' , auth , (req , res)=>{
 
-    Notes.find({owner: req.user._id}).sort({'createTime':'desc'}).then((notes)=>{
-        res.status(201).send(notes)
-    }).catch((e) =>{
-        res.status(500).send(e);
-    });
+    let page = parseInt(req.query.page) || 0; 
+    let limit = parseInt(req.query.limit) || 8;
+   
+    
 
-  
+    Notes.find({owner: req.user._id})
+    .sort({'createTime':'desc'})
+    .skip(page * limit)
+    .limit(limit)
+    .then(notes=>{
+        return Notes.countDocuments({owner: req.user._id})
+        .then (count=>{
+            return res.json({
+                total: count,
+                page: page,
+                per_page:limit,
+                total_page: Math.ceil(count/limit),
+                notes: notes
 
+              });
+        }).catch(e=>{
+            return res.send('Unable to get count');
+        })
+
+        
+
+    }).catch(e=>{
+        return res.send('Unable to fetch document');
+    })
 });
 
 //get all oldest Notes
 
 router.get('/notesoldest' , auth ,(req , res)=>{
 
-    Notes.find({owner: req.user._id}).sort({'createTime':'asc'}).then((notes)=>{
-        res.status(201).send(notes)
-    }).catch((e) =>{
-        res.status(500).send(e);
-    });
+    let page = parseInt(req.query.page) || 0; 
+    let limit = parseInt(req.query.limit) || 8;
+    
 
+    Notes.find({owner: req.user._id})
+    .sort({'createTime':'asc'})
+    .skip(page * limit)
+    .limit(limit)
+    .then(notes=>{
+        return Notes.countDocuments({owner: req.user._id})
+        .then (count=>{
+            return res.json({
+                total: count,
+                page: page,
+                per_page:limit,
+                total_page: Math.ceil(count/limit),
+                notes: notes
+
+              });
+        }).catch(e=>{
+            return res.send('Unable to get count');
+        })
+
+    }).catch(e=>{
+        return res.send('Unable to fetch document');
+    })
 });
 
 //get all the completed post
 
 router.get('/notescompleted' , auth ,(req , res)=>{
 
-    Notes.find({owner: req.user._id ,'complete':'true'}).then((notes)=>{
-        res.status(201).send(notes)
-    }).catch((e) =>{
-        res.status(500).send(e);
-    });
+    let page = parseInt(req.query.page) || 0; 
+    let limit = parseInt(req.query.limit) || 8;
+    
+
+    Notes.find({owner: req.user._id , 'complete':'true' })
+    .sort({'createTime':'asc'})
+    .skip(page * limit)
+    .limit(limit)
+    .then(notes=>{
+        return Notes.countDocuments({owner: req.user._id ,  'complete':'true'})
+        .then (count=>{
+            return res.json({
+                total: count,
+                page: page,
+                per_page:limit,
+                total_page: Math.ceil(count/limit),
+                notes: notes
+
+              });
+        }).catch(e=>{
+            return res.send('Unable to get count');
+        })
+
+    }).catch(e=>{
+        return res.send('Unable to fetch document');
+    })
+
 });
 
 
@@ -65,11 +128,32 @@ router.get('/notescompleted' , auth ,(req , res)=>{
 
 router.get('/notesnotcomplete' , auth,(req , res)=>{
 
-    Notes.find({owner: req.user._id , 'complete':'false'}).then((notes)=>{
-        res.status(201).send(notes)
-    }).catch((e) =>{
-        res.status(500).send(e);
-    });
+    let page = parseInt(req.query.page) || 0; 
+    let limit = parseInt(req.query.limit) || 8;
+    
+
+    Notes.find({owner: req.user._id , 'complete':'false' })
+    .sort({'createTime':'asc'})
+    .skip(page * limit)
+    .limit(limit)
+    .then(notes=>{
+        return Notes.countDocuments({owner: req.user._id ,  'complete':'false'})
+        .then (count=>{
+            return res.json({
+                total: count,
+                page: page,
+                per_page:limit,
+                total_page: Math.ceil(count/limit),
+                notes: notes
+
+              });
+        }).catch(e=>{
+            return res.send('Unable to get count');
+        })
+
+    }).catch(e=>{
+        return res.send('Unable to fetch document');
+    })
 });
 
 
