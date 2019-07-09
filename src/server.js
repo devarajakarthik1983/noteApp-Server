@@ -6,8 +6,11 @@ const feedbackRouter = require('./routers/feedback');
 const cors = require('cors');
 
 
+
+
+
 const app = express();
-const port = process.env.POST || 3001;
+const port = process.env.PORT;
 app.use(express.json());
 app.use(cors({
     origin: '*',

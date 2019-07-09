@@ -133,8 +133,7 @@ router.post('/newuser/:id/:id1' , (req ,res)=>{
     const email =  req.params.id;
     const token= req.params.id1
     const decodedEmail = decodeURIComponent(email);
-    console.log(decodedEmail);
-    console.log(token);
+   
 
     Users.findOne({email:decodedEmail}).then(user=>{
     if(token === user.activeToken){
@@ -151,22 +150,7 @@ router.post('/newuser/:id/:id1' , (req ,res)=>{
      })
 
   
-      //  //forgot username endpoint
-
-    //  app.get('/forgotusername/:id' , (req , res)=>{
-
-    //     const email =  req.params.id;
-    //     Users.find({email}).then((user)=>{
-    //         if(user.length === 0) {
-    //             res.status(404).send('Unable to find the username');
-    //         }
-    //         res.status(200).send(user);
-    //     }).catch((e)=>{
-    //         console.log(e);
-    //     })
    
-    //  })
-
 
     
 
@@ -186,7 +170,7 @@ router.post('/newuser/:id/:id1' , (req ,res)=>{
            
             res.status(200).send(user);
         }).catch((e)=>{
-            console.log(e);
+            res.send(e);
         })
    
      })
@@ -196,7 +180,7 @@ router.post('/newuser/:id/:id1' , (req ,res)=>{
      router.post('/newpasswordentry/:id' , async (req,res)=>{
         const email =  req.params.id;
         const password = await bcrypt.hash(req.body.password, 8);
-            console.log(password);
+           
             Users.findOne({email:email}).then(user=>{
 
                 if(email === user.email){

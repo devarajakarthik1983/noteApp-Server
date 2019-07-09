@@ -169,7 +169,7 @@ router.get('/notes/:id', auth , (req,res)=>{
             }
             res.status(200).send(note);
         }).catch((e)=>{
-            console.log(e);
+            res.send(e);
         })
     
 })
