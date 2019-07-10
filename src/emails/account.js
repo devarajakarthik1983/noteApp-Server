@@ -18,7 +18,7 @@ const sendActivationEmail =(email ,username ,token , encodedUrlEmail) => {
         to: email,
         from: 'no-reply@noteapp.com',
         subject: 'Thankyou for your registering',
-        text:`Hello ${username} , Thankyou for registering click the link to activate: http://localhost:3000/newuser/${encodedUrlEmail}/${token}`
+        text:`Hello ${username} , Thankyou for registering click the link to activate: https://noteappfrontend.herokuapp.com/newuser/${encodedUrlEmail}/${token}`
     })
 }
 
@@ -28,7 +28,7 @@ const sendActivationPassword =(email ,username ,token , encodedUrlEmail) => {
         to: email,
         from: 'no-reply@noteapp.com',
         subject: 'Your Password activation link',
-        text:`Hello ${username} , Hello here is you password link to activate: http://localhost:3000/passwordactivation/${encodedUrlEmail}/${token}`
+        text:`Hello ${username} , Hello here is you password link to activate: https://noteappfrontend.herokuapp.com/passwordactivation/${encodedUrlEmail}/${token}`
     })
 }
 
